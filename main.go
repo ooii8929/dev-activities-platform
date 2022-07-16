@@ -11,18 +11,12 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-type Manager struct {
-    cookieName  string     // private cookiename
-    lock        sync.Mutex // protects session
-    provider    Provider
-    maxLifeTime int64
-}
+
 
 type Provider interface {
     SessionInit(sid string) (Session, error)
@@ -38,13 +32,6 @@ type Session interface {
     SessionID() string                // back current sessionID
 }
 
-func NewManager(provideName, cookieName string, maxLifeTime int64) (*Manager, error) {
-    provider, ok := provides[provideName]
-    if !ok {
-        return nil, fmt.Errorf("session: unknown provide %q (forgotten import?)", provideName)
-    }
-    return &Manager{provider: provider, cookieName: cookieName, maxLifeTime: maxLifeTime}, nil
-}
 
 func sayhelloName(w http.ResponseWriter, r *http.Request) {
     r.ParseForm()  //解析參數，預設是不會解析的
