@@ -12,6 +12,7 @@ import (
 
 // get one
 func UserGet(ctx *gin.Context) {
+	fmt.Println("ctx", ctx)
 	id, _ := strconv.Atoi(ctx.Param("id"))
 	userModel := models.User{}
 
@@ -57,10 +58,10 @@ func UserGetList(ctx *gin.Context) {
 func UserPost(ctx *gin.Context) {
 
 	name := ctx.PostForm("name")
-	age := ctx.PostForm("age")
-	ageNumber, _ := strconv.Atoi(age) // default is string
+	email := ctx.PostForm("email")
+	password := ctx.PostForm("password")
 
-	userModel := models.User{Name: name, Age: ageNumber}
+	userModel := models.User{Name: name, Email: email, Password: password}
 
 	if err := ctx.ShouldBind(&userModel); nil != err {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -70,8 +71,6 @@ func UserPost(ctx *gin.Context) {
 	}
 
 	id, err := userModel.UserAdd()
-
-	fmt.Println("id",id)
 
 	if nil != err {
 		ctx.JSON(http.StatusBadRequest, gin.H{

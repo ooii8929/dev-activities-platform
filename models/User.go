@@ -14,13 +14,28 @@ var db *sql.DB = drivers.MysqlDb
 type User struct {
 	Id   int    `json:"id" form:"id" primaryKey:"true"`
 	Name string `json:"name" form:"name" binding:"required"`
-	Age  int    `json:"age" form:"age" binding:"required"`
+	Email  string    `json:"email" form:"email" binding:"required"`
+	Password	string	`json:"password" form:"password"`
+
 }
 
 // get one
 func (model *User) UserGet(id int) (user User, err error) {
 	// find one record
-	err = db.QueryRow("SELECT `id`, `name`, `age` FROM `users` WHERE `id` = ?", id).Scan(&user.Id, &user.Name, &user.Age)
+	err = db.QueryRow("SELECT `id`, `name`, `email` FROM `users` WHERE `id` = ?", id).Scan(&user.Id, &user.Name, &user.Email)
+
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+
+	return
+}
+
+// get Info
+func (model *User) UserGetByEmail(email string) (user User, err error) {
+	// find one record
+	err = db.QueryRow("SELECT `id`, `name`, `email`, `password` FROM `users` WHERE `email` = ?", email).Scan(&user.Id, &user.Name, &user.Email, &user.Password )
 
 	if err != nil {
 		log.Println(err.Error())
@@ -37,7 +52,7 @@ func (model *User) UserGetList(page int, pageSize int) (users []User, err error)
 	offset := pageSize * (page - 1)
 	limit := pageSize
 
-	rows, err := db.Query("SELECT `id`, `name`, `age` FROM `users` LIMIT ?, ?", offset, limit)
+	rows, err := db.Query("SELECT `id`, `name` FROM `users` LIMIT ?, ?", offset, limit)
 	defer rows.Close()
 
 	if err != nil {
@@ -47,7 +62,7 @@ func (model *User) UserGetList(page int, pageSize int) (users []User, err error)
 
 	var user User
 	for rows.Next() {
-		rows.Scan(&user.Id, &user.Name, &user.Age)
+		rows.Scan(&user.Id, &user.Name, &user.Email)
 		users = append(users, user)
 	}
 
@@ -60,7 +75,7 @@ func (model *User) UserGetList(page int, pageSize int) (users []User, err error)
 
 // create
 func (model *User) UserAdd() (id int64, err error) {
-	result, err := db.Exec("INSERT INTO `users`(`name`, `age`) VALUES (?, ?)", model.Name, model.Age)
+	result, err := db.Exec("INSERT INTO `users`(`name`, `Email`) VALUES (?, ?)", model.Name, model.Email)
 
 	if nil != err {
 		log.Println(err.Error())
@@ -73,7 +88,7 @@ func (model *User) UserAdd() (id int64, err error) {
 
 // update
 func (model *User) UserUpdate(id int) (afr int64, err error) {
-	result, err := db.Exec("UPDATE `users` SET `name` = ?, `age` = ? WHERE `id` = ?", model.Name, model.Age, id)
+	result, err := db.Exec("UPDATE `users` SET `name` = ?, `email` = ? WHERE `id` = ?", model.Name, model.Email, id)
 
 	if nil != err {
 		log.Println(err.Error())
