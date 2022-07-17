@@ -1,28 +1,19 @@
 package main
 
 import (
-	"dev-platform/globals"
-	"dev-platform/routes"
+	"dev-platform/drivers"
+	"dev-platform/server"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 
+var HttpServer *gin.Engine
 
 func main() {
+	// 服务停止时清理数据库链接
+	defer drivers.MysqlDb.Close()
 
-    router := gin.Default()
-
-		router.Static("/static", "./static")
-
-		router.Use(sessions.Sessions("session", cookie.NewStore(globals.Secret)))
-
-    public := router.Group("/")
-		routes.PublicRoutes(public)
-    
-    router.Run(":9090")
-
+	// 启动服务
+	server.Run(HttpServer)
 }

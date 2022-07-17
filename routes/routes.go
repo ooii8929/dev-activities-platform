@@ -1,21 +1,19 @@
 package routes
 
 import (
+	"dev-platform/controllers"
 	"github.com/gin-gonic/gin"
-
-	controllers "dev-platform/controllers"
 )
 
-func PublicRoutes(g *gin.RouterGroup) {
+func RegisterRoutes(router *gin.Engine) {
+	router.GET("/", controllers.IndexHome)
+	router.GET("/index", controllers.IndexHome)
+	router.GET("/login", controllers.IndexLogin)
 
-	// g.GET("/login", controllers.LoginGetHandler())
-	g.POST("/login", controllers.LoginPostHandler())
-	// g.GET("/ping", func(c *gin.Context) {
-	// 	c.JSON(200, gin.H{
-	// 		"message": "pong",
-	// 	})
-	// })
-	// g.GET("/", controllers.IndexGetHandler())
-
-
+	router.GET("/users/:id", controllers.UserGet)
+	router.GET("/users", controllers.UserGetList)
+	router.POST("/login", controllers.UserPost)
+	router.PUT("/users/:id", controllers.UserPut)
+	router.PATCH("/users/:id", controllers.UserPut)
+	router.DELETE("/users/:id", controllers.UserDelete)
 }
